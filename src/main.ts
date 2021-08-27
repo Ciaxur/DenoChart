@@ -8,6 +8,7 @@ const { canvas } = CanvasInstance;
 // TEST:
 const graph = new Graph({
   bar_width: 25,
+  graphSegments_X: 18,
 });
 
 const COLORS = [
@@ -18,6 +19,8 @@ const COLORS = [
 for (let i = 0; i < 12; i++) {
   const clr = COLORS[Math.floor(Math.random() * COLORS.length)];
   const y = Math.floor(Math.random() * 256);
+
+  // DEBUG: Prints
   console.log(`Drawing Bar ${i} with height[${y}] & color[${clr}]`);
   
   graph.add({
