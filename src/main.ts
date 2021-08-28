@@ -9,6 +9,10 @@ const { canvas } = CanvasInstance;
 const graph = new Graph({
   bar_width: 25,
   graphSegments_X: 18,
+  xTextColor: 'rgba(255,255,255,1)',
+  xSegmentColor: 'rgba(255,255,255,0.5)',
+  yTextColor: 'rgba(255,255,255,1)',
+  ySegmentColor: 'rgba(255,255,255,0.5)',
 });
 
 const COLORS = [

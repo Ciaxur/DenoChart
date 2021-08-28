@@ -8,6 +8,13 @@ interface GraphOptions {
 
   graphSegments_Y: number,
   graphSegments_X: number,
+
+  titleColor: string,
+  xTextColor: string,
+  yTextColor: string,
+
+  xSegmentColor: string,
+  ySegmentColor: string,
 }
 
 interface BarEntry {
@@ -28,7 +35,6 @@ export class Graph {
   private _options: GraphOptions;
   // TODO:
   //  - Add Labels
-  //  - Add Bar Colors
 
   
   constructor(config?: Partial<GraphOptions>) {
@@ -39,6 +45,13 @@ export class Graph {
 
       graphSegments_X: config && config.graphSegments_X || 10,
       graphSegments_Y: config && config.graphSegments_Y || 10,
+
+      titleColor: config && config.titleColor || 'rgb(255,255,255)',
+      xTextColor: config && config.xTextColor || 'rgb(255,255,255)',
+      yTextColor: config && config.yTextColor || 'rgb(255,255,255)',
+      
+      xSegmentColor: config && config.xSegmentColor || 'rgb(255,255,255)',
+      ySegmentColor: config && config.ySegmentColor || 'rgb(255,255,255)',
     }
 
     console.log('Create Graph with Options:', this._options);
@@ -58,14 +71,16 @@ export class Graph {
 
     // Drawing Style Config
     ctx.save();
-    ctx.strokeStyle = 'rgb(255,255,255)';
-    ctx.fillStyle = 'rgb(255,255,255)';
+    ctx.strokeStyle = this._options.titleColor;
+    ctx.fillStyle = this._options.titleColor;
     ctx.lineWidth = 1.5;
 
     // Graph Title
     drawTextWithFont('Title', (WIDTH / 2) - 30, this.y_offset, '12pt Cochin');
 
     // X-Axis
+    ctx.strokeStyle = this._options.xTextColor;
+    ctx.fillStyle = this._options.xTextColor;
     ctx.fillText('X-Axis', (WIDTH / 2) - 10, (HEIGHT - this.y_offset / 2) + 10);
 
     ctx.beginPath();
@@ -75,6 +90,8 @@ export class Graph {
     ctx.closePath();
 
     // Y-Axis
+    ctx.strokeStyle = this._options.yTextColor;
+    ctx.fillStyle = this._options.yTextColor;
     ctx.fillText('Y-Axis', (this.x_offset / 2) - 8, (HEIGHT / 2));
 
     ctx.beginPath();
@@ -90,12 +107,12 @@ export class Graph {
     const { graphSegments_X, graphSegments_Y } = this._options;
 
     // Y-Axis Segmentations
-    ctx.fillStyle = '#ECF0F1';
-
     const Y_SEGMENTS = HEIGHT / graphSegments_Y;
     for (let i = 0; i < graphSegments_Y - 1; i++) {
       const Y = (HEIGHT - (Y_SEGMENTS * i)) - this.y_padding;
       
+      ctx.fillStyle = '#ECF0F1';
+      ctx.strokeStyle = '#ECF0F1';
       ctx.beginPath();
       ctx.arc(
         this.x_padding, 
@@ -107,6 +124,8 @@ export class Graph {
       ctx.fill();
 
       // X Value Text (Index)
+      ctx.fillStyle = this._options.ySegmentColor;
+      ctx.strokeStyle = this._options.ySegmentColor;
       ctx.fillText((HEIGHT - this.y_padding - Y).toString(), this.x_padding - 20, Y);
     }
 
@@ -115,6 +134,8 @@ export class Graph {
     for (let i = 0; i < graphSegments_X - 1; i++) {
       const X = this.x_padding + X_SEGMENTS * i;
 
+      ctx.fillStyle = '#ECF0F1';
+      ctx.strokeStyle = '#ECF0F1';
       ctx.beginPath();
       ctx.arc(
         X, 
@@ -126,6 +147,8 @@ export class Graph {
       ctx.fill();
 
       // X Value Text (Index)
+      ctx.fillStyle = this._options.xSegmentColor;
+      ctx.strokeStyle = this._options.xSegmentColor;
       ctx.fillText(i.toString(), X, HEIGHT - this.y_offset + 12);
     }
   }
