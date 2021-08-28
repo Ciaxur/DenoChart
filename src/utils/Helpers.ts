@@ -30,3 +30,22 @@ export function drawTextWithFont(text: string, x: number, y: number, font?: stri
   ctx.fillText(text, x, y);
   ctx.font = originalFont;
 }
+
+/**
+ * Normalizes the given value to a range
+ * @param val Value to normalize
+ * @param min Minimum Range
+ * @param max Maximum Range
+ * @returns The normalized value
+ */
+export function normalize(val: number, min: number, max: number): number {
+  return (val - min) / (max - min);
+}
+
+/**
+ * Computes the max value within a given array
+ * @param array Array of number to find max number of
+ */
+export function max(array: number[]): number {
+  return array.reduce((acc, val) => val > acc ? val : acc, 0);
+}

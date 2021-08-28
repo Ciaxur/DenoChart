@@ -1,11 +1,13 @@
 import { CanvasInstance } from '../config/index.ts';
-import { Vector2D, background, drawTextWithFont } from '../utils/index.ts';
+import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils/index.ts';
 
 
 interface GraphOptions {
   titleText: string,
   xAxisText: string,
   yAxisText: string,
+
+  yMax:         number,
   
   bar_width:    number,
   bar_spacing:  number,
@@ -42,17 +44,25 @@ export class Graph {
 
   
   constructor(config?: Partial<GraphOptions>) {
+    const { HEIGHT } = CanvasInstance;
+    
+    // Setup Default Segments & Max Values
+    const graphSegments_Y = 10;
+    const yMax = (HEIGHT / graphSegments_Y) * (graphSegments_Y - 2);
+    
     // Configure Graph
     this._options = {
       titleText: config && config.titleText || 'title',
       xAxisText: config && config.xAxisText || 'X-Axis',
       yAxisText: config && config.yAxisText || 'Y-Axis',
+
+      yMax: config && config.yMax || yMax,
       
       bar_width:    config && config.bar_width   || 10,
       bar_spacing:  config && config.bar_spacing || 5,
 
       graphSegments_X: config && config.graphSegments_X || 10,
-      graphSegments_Y: config && config.graphSegments_Y || 10,
+      graphSegments_Y: config && config.graphSegments_Y || graphSegments_Y,
 
       titleColor: config && config.titleColor || 'rgb(255,255,255)',
       xTextColor: config && config.xTextColor || 'rgb(255,255,255)',
@@ -116,6 +126,8 @@ export class Graph {
 
     // Y-Axis Segmentations
     const Y_SEGMENTS = HEIGHT / graphSegments_Y;
+    const maxY_segment = Y_SEGMENTS * (graphSegments_Y - 2);
+    
     for (let i = 0; i < graphSegments_Y - 1; i++) {
       const Y = (HEIGHT - (Y_SEGMENTS * i)) - this.y_padding;
       
@@ -134,7 +146,14 @@ export class Graph {
       // X Value Text (Index)
       ctx.fillStyle = this._options.ySegmentColor;
       ctx.strokeStyle = this._options.ySegmentColor;
-      ctx.fillText((HEIGHT - this.y_padding - Y).toString(), this.x_padding - 20, Y);
+
+      const normalized = normalize((HEIGHT - this.y_padding - Y), 0, maxY_segment);
+      const yVal = normalized * this._options.yMax;
+      ctx.fillText(
+        yVal.toString(),
+        this.x_padding - ((yVal % 1 === 0) ? 25 :35),
+        Y,
+      );
     }
 
     // X-Axis Segmentations
@@ -163,10 +182,15 @@ export class Graph {
 
   private _draw_bars() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
-    const { bar_width, graphSegments_X } = this._options;
+    const { bar_width, graphSegments_X, graphSegments_Y } = this._options;
     
     ctx.save();
 
+    // Find max bar value to map based on yMax
+    const Y_SEGMENTS = HEIGHT / graphSegments_Y;
+    const maxY_segment = Y_SEGMENTS * (graphSegments_Y - 2);
+    const maxBarValue = max(this._entries.map(elt => elt.position.y));
+    
     // Space out each Entry to given Segments
     const X_SEGMENTS = (WIDTH - this.x_padding) / graphSegments_X;
     for (let i = 0; i < graphSegments_X; i++) {
@@ -180,17 +204,20 @@ export class Graph {
       ctx.fillStyle = entry.color;
       ctx.beginPath();
       
+      // Max X & Y Points
       const X = this.x_padding + X_SEGMENTS * i;
+      const Y = normalize(y, 0, maxBarValue) * maxY_segment;
+      
       ctx.fillRect(
         X,
-        HEIGHT - this.y_offset - y,
+        HEIGHT - this.y_offset - Y,
         bar_width, 
-        y,
+        Y,
       );
       ctx.closePath();
 
       // Y Value text (Value)
-      ctx.fillText(y.toString(), X + 5, HEIGHT - this.y_offset - y - 10);
+      ctx.fillText(y.toString(), X + 5, HEIGHT - this.y_offset - Y - 10);
     }
     
     ctx.restore();

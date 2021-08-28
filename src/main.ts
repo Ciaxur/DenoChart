@@ -1,14 +1,21 @@
 import { CanvasInstance } from './config/index.ts';
 import { Graph } from './graph/index.ts';
-import { Vector2D, background, drawTextWithFont } from './utils/index.ts';
+import { Vector2D } from './utils/index.ts';
 
 CanvasInstance.init(720, 480);
 const { canvas } = CanvasInstance;
 
 // TEST:
 const graph = new Graph({
+  titleText: 'Uptime',
+  xAxisText: 'Hours',
+  yAxisText: 'Day',
+  
+  yMax: 50,
+  
   bar_width: 25,
   graphSegments_X: 18,
+  
   xTextColor: 'rgba(255,255,255,1)',
   xSegmentColor: 'rgba(255,255,255,0.5)',
   yTextColor: 'rgba(255,255,255,1)',
@@ -22,7 +29,7 @@ const COLORS = [
 
 for (let i = 0; i < 12; i++) {
   const clr = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const y = Math.floor(Math.random() * 256);
+  const y = Math.floor(Math.random() * 50);
 
   // DEBUG: Prints
   console.log(`Drawing Bar ${i} with height[${y}] & color[${clr}]`);
