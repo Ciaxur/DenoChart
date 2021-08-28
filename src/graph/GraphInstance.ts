@@ -3,6 +3,10 @@ import { Vector2D, background, drawTextWithFont } from '../utils/index.ts';
 
 
 interface GraphOptions {
+  titleText: string,
+  xAxisText: string,
+  yAxisText: string,
+  
   bar_width:    number,
   bar_spacing:  number,
 
@@ -40,6 +44,10 @@ export class Graph {
   constructor(config?: Partial<GraphOptions>) {
     // Configure Graph
     this._options = {
+      titleText: config && config.titleText || 'title',
+      xAxisText: config && config.xAxisText || 'X-Axis',
+      yAxisText: config && config.yAxisText || 'Y-Axis',
+      
       bar_width:    config && config.bar_width   || 10,
       bar_spacing:  config && config.bar_spacing || 5,
 
@@ -76,12 +84,12 @@ export class Graph {
     ctx.lineWidth = 1.5;
 
     // Graph Title
-    drawTextWithFont('Title', (WIDTH / 2) - 30, this.y_offset, '12pt Cochin');
+    drawTextWithFont(this._options.titleText, (WIDTH / 2) - 30, this.y_offset, '12pt Cochin');
 
     // X-Axis
     ctx.strokeStyle = this._options.xTextColor;
     ctx.fillStyle = this._options.xTextColor;
-    ctx.fillText('X-Axis', (WIDTH / 2) - 10, (HEIGHT - this.y_offset / 2) + 10);
+    ctx.fillText(this._options.xAxisText, (WIDTH / 2) - 10, (HEIGHT - this.y_offset / 2) + 10);
 
     ctx.beginPath();
     ctx.lineTo(this.x_padding, HEIGHT - this.y_padding);
@@ -92,7 +100,7 @@ export class Graph {
     // Y-Axis
     ctx.strokeStyle = this._options.yTextColor;
     ctx.fillStyle = this._options.yTextColor;
-    ctx.fillText('Y-Axis', (this.x_offset / 2) - 8, (HEIGHT / 2));
+    ctx.fillText(this._options.yAxisText, (this.x_offset / 2) - 8, (HEIGHT / 2));
 
     ctx.beginPath();
     ctx.lineTo(this.x_padding, HEIGHT - this.y_padding);
