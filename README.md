@@ -1,7 +1,7 @@
 # Canvas-API Chart for Deno
 A graph library for deno. Inspired by [Chart.js](https://www.chartjs.org/). A simpler implementation for basic bar graphs that save to an image.
 
-## Use with Deno
+## 🚀 Use with Deno
 ```typescript
 import Graph, { Vector2D } from 'https://raw.githubusercontent.com/Ciaxur/canvas-api-chart.deno/main/mod.ts';
 
@@ -44,10 +44,13 @@ graph.draw();
 graph.save('image.png');
 ```
 
-## Generated Image
+## 🎆 Generated Image
 <p align="center">
   <img 
     src="misc/Image1.png"
     width="80%"
   >
 </p>
+
+## 📙 License
+Licensed under [MIT](LICENSE).
