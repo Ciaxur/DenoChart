@@ -3,7 +3,7 @@ A graph library for Deno. Inspired by [Chart.js](https://www.chartjs.org/). A si
 
 ## 🚀 Use with Deno
 ```typescript
-import Graph, { Vector2D } from 'https://raw.githubusercontent.com/Ciaxur/canvas-api-chart.deno/main/mod.ts';
+import Graph, { Vector2D } from 'https://deno.land/x/deno_chart/mod.ts';
 
 const graph = new Graph({
   titleText: 'Uptime',
