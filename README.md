@@ -1,5 +1,5 @@
 # Canvas-API Chart for Deno
-A graph library for deno. Inspired by [Chart.js](https://www.chartjs.org/). A simpler implementation for basic bar graphs that save to an image.
+A graph library for Deno. Inspired by [Chart.js](https://www.chartjs.org/). A simpler implementation for basic bar graphs that save to an image.
 
 ## 🚀 Use with Deno
 ```typescript
