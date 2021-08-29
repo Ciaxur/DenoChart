@@ -2,9 +2,6 @@ import { CanvasInstance } from './config/index.ts';
 import { Graph } from './graph/index.ts';
 import { Vector2D } from './utils/index.ts';
 
-CanvasInstance.init(720, 480);
-const { canvas } = CanvasInstance;
-
 // TEST:
 const graph = new Graph({
   titleText: 'Uptime',
@@ -15,11 +12,12 @@ const graph = new Graph({
   
   bar_width: 25,
   graphSegments_X: 18,
-  
+
   xTextColor: 'rgba(255,255,255,1)',
   xSegmentColor: 'rgba(255,255,255,0.5)',
   yTextColor: 'rgba(255,255,255,1)',
   ySegmentColor: 'rgba(255,255,255,0.5)',
+  verbose: true,
 });
 
 const COLORS = [
@@ -41,8 +39,4 @@ for (let i = 0; i < 12; i++) {
 }
 
 graph.draw();
-
-
-
-const imageBuffer = canvas.toBuffer();
-Deno.writeFileSync('image.png', imageBuffer);
+graph.save('image.png');

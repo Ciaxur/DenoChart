@@ -3,6 +3,10 @@ import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils
 
 
 interface GraphOptions {
+  // Canvas Width & Height
+  width: number,
+  height: number,
+  
   // Graph Text
   titleText: string,
   xAxisText: string,
@@ -31,6 +35,9 @@ interface GraphOptions {
   // Segmentation Color
   xSegmentColor: string,
   ySegmentColor: string,
+
+  // DEBUG: Options
+  verbose: boolean,   // Enable/Disable Logging
 }
 
 interface BarEntry {
@@ -64,6 +71,9 @@ export class Graph {
     
     // Configure Graph
     this._options = {
+      height: config && config.height || 480,
+      width: config && config.width || 720,
+      
       titleText: config && config.titleText || 'title',
       xAxisText: config && config.xAxisText || 'X-Axis',
       yAxisText: config && config.yAxisText || 'Y-Axis',
@@ -85,6 +95,8 @@ export class Graph {
       
       xSegmentColor: config && config.xSegmentColor || 'rgb(255,255,255)',
       ySegmentColor: config && config.ySegmentColor || 'rgb(255,255,255)',
+
+      verbose: config && config.verbose || false,
     }
 
     // Apply Graph Padding
@@ -93,7 +105,16 @@ export class Graph {
     this._x_offset += this._options.xPadding;
     this._y_offset += this._options.yPadding;
 
-    console.log('Create Graph with Options:', this._options);
+    // Initialize Canvas Instance if have NOT already
+    if (!CanvasInstance.ready()) {
+      CanvasInstance.init(this._options.width, this._options.height);
+
+      if (this._options.verbose)
+        console.log(`Initialized Canvas Instance W[${this._options.width}] H[${this._options.height}]`);
+    }
+
+    if (this._options.verbose)
+      console.log('Create Graph with Options:', this._options);
   }
 
   /**
@@ -257,7 +278,7 @@ export class Graph {
   }
   
   /**
-   * Draws graph with entries
+   * Draws graph with entries to Canvas Context
    */
   public draw() {
     background(50, 50, 50, 0.5);
@@ -266,4 +287,18 @@ export class Graph {
     this._draw_graph_outline();
     this._draw_graph_segments();
   }
+
+  /**
+   * Saves graph as png to given path
+   * @param imagePath Path of image to save to
+   */
+  public save(imagePath: string) {
+    const { canvas } = CanvasInstance;
+    const imageBuffer = canvas.toBuffer();
+    Deno.writeFileSync(imagePath, imageBuffer);
+
+    if (this._options.verbose)
+      console.log(`Graph save to '${imagePath}'`);
+  }
+  
 };

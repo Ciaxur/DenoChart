@@ -16,6 +16,13 @@ export class CanvasInstance {
   private constructor() {}
 
   /**
+   * Returns the ready state of the Canvas Instance
+   */
+  public static ready(): boolean {
+    return this._canvas !== null;
+  }
+
+  /**
    * Instantiates a Canvas Instance
    * @param width Canvas Width
    * @param height Canvas Height
