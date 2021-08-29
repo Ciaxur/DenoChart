@@ -3,22 +3,32 @@ import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils
 
 
 interface GraphOptions {
+  // Graph Text
   titleText: string,
   xAxisText: string,
   yAxisText: string,
 
+  // Y-Max Normalized Value
   yMax:         number,
+
+  // Graph Outer-Padding
+  yPadding: number,
+  xPadding: number,
   
+  // Bar Config
   bar_width:    number,
   bar_spacing:  number,
 
+  // Graph Segements
   graphSegments_Y: number,
   graphSegments_X: number,
 
+  // Text Color
   titleColor: string,
   xTextColor: string,
   yTextColor: string,
-
+  
+  // Segmentation Color
   xSegmentColor: string,
   ySegmentColor: string,
 }
@@ -30,19 +40,21 @@ interface BarEntry {
 
 export class Graph {
   // Graph Offsets
-  private y_offset = 30;
-  private x_offset = 30;
-  private y_padding = 30;
-  private x_padding = 50;
+  private _y_offset = 30;
+  private _x_offset = 30;
+  private _y_padding = 30;
+  private _x_padding = 50;
 
   private _entries: BarEntry[] = [];
 
   // Graph Configuration
   private _options: GraphOptions;
-  // TODO:
-  //  - Add Labels
 
   
+  /**
+   * Constructs Graph Configuration
+   * @param config (Optional) Graph Configuration
+   */
   constructor(config?: Partial<GraphOptions>) {
     const { HEIGHT } = CanvasInstance;
     
@@ -57,6 +69,9 @@ export class Graph {
       yAxisText: config && config.yAxisText || 'Y-Axis',
 
       yMax: config && config.yMax || yMax,
+
+      yPadding: config && config.yPadding || 0,
+      xPadding: config && config.xPadding || 0,
       
       bar_width:    config && config.bar_width   || 10,
       bar_spacing:  config && config.bar_spacing || 5,
@@ -72,14 +87,26 @@ export class Graph {
       ySegmentColor: config && config.ySegmentColor || 'rgb(255,255,255)',
     }
 
+    // Apply Graph Padding
+    this._x_padding += this._options.xPadding;
+    this._y_padding += this._options.yPadding;
+    this._x_offset += this._options.xPadding;
+    this._y_offset += this._options.yPadding;
+
     console.log('Create Graph with Options:', this._options);
   }
 
-
+  /**
+   * Adds given Bar entry to Graph
+   * @param entry Entry to add to graph
+   */
   public add(entry: BarEntry): void {
     this._entries.push(entry);
   }
   
+  /**
+   * Internal: Draws Graph outline
+   */
   private _draw_graph_outline() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
     
@@ -94,32 +121,35 @@ export class Graph {
     ctx.lineWidth = 1.5;
 
     // Graph Title
-    drawTextWithFont(this._options.titleText, (WIDTH / 2) - 30, this.y_offset, '12pt Cochin');
+    drawTextWithFont(this._options.titleText, (WIDTH / 2) - 30, this._y_offset, '12pt Cochin');
 
     // X-Axis
     ctx.strokeStyle = this._options.xTextColor;
     ctx.fillStyle = this._options.xTextColor;
-    ctx.fillText(this._options.xAxisText, (WIDTH / 2) - 10, (HEIGHT - this.y_offset / 2) + 10);
+    ctx.fillText(this._options.xAxisText, (WIDTH / 2) - 10, (HEIGHT - this._y_offset / 2) + 10);
 
     ctx.beginPath();
-    ctx.lineTo(this.x_padding, HEIGHT - this.y_padding);
-    ctx.lineTo(this.x_padding, this.y_padding);
+    ctx.lineTo(this._x_padding, HEIGHT - this._y_padding);
+    ctx.lineTo(this._x_padding, this._y_padding);
     ctx.stroke();
     ctx.closePath();
 
     // Y-Axis
     ctx.strokeStyle = this._options.yTextColor;
     ctx.fillStyle = this._options.yTextColor;
-    ctx.fillText(this._options.yAxisText, (this.x_offset / 2) - 8, (HEIGHT / 2));
+    ctx.fillText(this._options.yAxisText, (this._x_offset / 2) - 8, (HEIGHT / 2));
 
     ctx.beginPath();
-    ctx.lineTo(this.x_padding, HEIGHT - this.y_padding);
-    ctx.lineTo(WIDTH - this.x_padding, HEIGHT - this.y_padding);
+    ctx.lineTo(this._x_padding, HEIGHT - this._y_padding);
+    ctx.lineTo(WIDTH - this._x_padding, HEIGHT - this._y_padding);
     ctx.stroke();
     ctx.closePath();
     ctx.restore();
   }
 
+  /**
+   * Internal: Draws graph segments
+   */
   private _draw_graph_segments() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
     const { graphSegments_X, graphSegments_Y } = this._options;
@@ -129,13 +159,13 @@ export class Graph {
     const maxY_segment = Y_SEGMENTS * (graphSegments_Y - 2);
     
     for (let i = 0; i < graphSegments_Y - 1; i++) {
-      const Y = (HEIGHT - (Y_SEGMENTS * i)) - this.y_padding;
+      const Y = (HEIGHT - (Y_SEGMENTS * i)) - this._y_padding;
       
       ctx.fillStyle = '#ECF0F1';
       ctx.strokeStyle = '#ECF0F1';
       ctx.beginPath();
       ctx.arc(
-        this.x_padding, 
+        this._x_padding, 
         Y,
         2,
         0, Math.PI * 2,
@@ -147,26 +177,26 @@ export class Graph {
       ctx.fillStyle = this._options.ySegmentColor;
       ctx.strokeStyle = this._options.ySegmentColor;
 
-      const normalized = normalize((HEIGHT - this.y_padding - Y), 0, maxY_segment);
+      const normalized = normalize((HEIGHT - this._y_padding - Y), 0, maxY_segment);
       const yVal = normalized * this._options.yMax;
       ctx.fillText(
         yVal.toString(),
-        this.x_padding - ((yVal % 1 === 0) ? 25 :35),
+        this._x_padding - ((yVal % 1 === 0) ? 25 :35),
         Y,
       );
     }
 
     // X-Axis Segmentations
-    const X_SEGMENTS = (WIDTH - this.x_padding) / graphSegments_X;
+    const X_SEGMENTS = (WIDTH - this._x_padding) / graphSegments_X;
     for (let i = 0; i < graphSegments_X - 1; i++) {
-      const X = this.x_padding + X_SEGMENTS * i;
+      const X = this._x_padding + X_SEGMENTS * i;
 
       ctx.fillStyle = '#ECF0F1';
       ctx.strokeStyle = '#ECF0F1';
       ctx.beginPath();
       ctx.arc(
         X, 
-        HEIGHT - this.y_padding,
+        HEIGHT - this._y_padding,
         2,
         0, Math.PI * 2,
       );
@@ -176,10 +206,13 @@ export class Graph {
       // X Value Text (Index)
       ctx.fillStyle = this._options.xSegmentColor;
       ctx.strokeStyle = this._options.xSegmentColor;
-      ctx.fillText(i.toString(), X, HEIGHT - this.y_offset + 12);
+      ctx.fillText(i.toString(), X, HEIGHT - this._y_offset + 12);
     }
   }
 
+  /**
+   * Internal: Draws graph bar entries
+   */
   private _draw_bars() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
     const { bar_width, graphSegments_X, graphSegments_Y } = this._options;
@@ -192,7 +225,7 @@ export class Graph {
     const maxBarValue = max(this._entries.map(elt => elt.position.y));
     
     // Space out each Entry to given Segments
-    const X_SEGMENTS = (WIDTH - this.x_padding) / graphSegments_X;
+    const X_SEGMENTS = (WIDTH - this._x_padding) / graphSegments_X;
     for (let i = 0; i < graphSegments_X; i++) {
       // Constrain to # of entries
       if (i >= this._entries.length)
@@ -205,24 +238,27 @@ export class Graph {
       ctx.beginPath();
       
       // Max X & Y Points
-      const X = this.x_padding + X_SEGMENTS * i;
+      const X = this._x_padding + X_SEGMENTS * i;
       const Y = normalize(y, 0, maxBarValue) * maxY_segment;
       
       ctx.fillRect(
         X,
-        HEIGHT - this.y_offset - Y,
+        HEIGHT - this._y_offset - Y,
         bar_width, 
         Y,
       );
       ctx.closePath();
 
       // Y Value text (Value)
-      ctx.fillText(y.toString(), X + 5, HEIGHT - this.y_offset - Y - 10);
+      ctx.fillText(y.toString(), X + 5, HEIGHT - this._y_offset - Y - 10);
     }
     
     ctx.restore();
   }
   
+  /**
+   * Draws graph with entries
+   */
   public draw() {
     background(50, 50, 50, 0.5);
     
@@ -230,5 +266,4 @@ export class Graph {
     this._draw_graph_outline();
     this._draw_graph_segments();
   }
-
 };
