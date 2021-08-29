@@ -2,7 +2,7 @@ import { CanvasInstance } from '../config/index.ts';
 import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils/index.ts';
 
 
-interface GraphOptions {
+export interface GraphOptions {
   // Canvas Width & Height
   width: number,
   height: number,
@@ -40,7 +40,7 @@ interface GraphOptions {
   verbose: boolean,   // Enable/Disable Logging
 }
 
-interface BarEntry {
+export interface BarEntry {
   position: Vector2D,
   color:    string,
 }

@@ -1,7 +1,7 @@
 import Canvas, { 
   EmulatedCanvas2D,
   CanvasRenderingContext2D,
-} from 'https://deno.land/x/canvas@v1.2.2/mod.ts'
+} from '../deps.ts';
 
 
 export class CanvasInstance {
