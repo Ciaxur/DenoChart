@@ -93,7 +93,7 @@ export class Graph {
       xAxisText: config && config.xAxisText || 'X-Axis',
       yAxisText: config && config.yAxisText || 'Y-Axis',
 
-      yMax: config && config.yMax || yMax,
+      yMax: config && config.yMax || -1,
 
       yPadding: config && config.yPadding || 0,
       xPadding: config && config.xPadding || 0,
@@ -188,7 +188,15 @@ export class Graph {
    */
   private _draw_graph_segments() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
-    const { graphSegments_X, graphSegments_Y } = this._options;
+    const { graphSegments_X, graphSegments_Y, graphValuePrecision } = this._options;
+
+    // Evaluate yMax if selected
+    this._options.yMax = this._options.yMax === -1
+      ? max(this._entries.map(elt => elt.val))
+      : this._options.yMax;
+    
+    if (this._options.verbose)
+      console.log('yMax Evaluated to: ', this._options.yMax);
 
     // Y-Axis Segmentations
     const Y_SEGMENTS = HEIGHT / graphSegments_Y;
