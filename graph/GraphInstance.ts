@@ -49,7 +49,8 @@ export interface GraphOptions {
 }
 
 export interface BarEntry {
-  position: Vector2D,
+  val:      number,
+  label?:   string,
   color:    string,
 }
 
@@ -239,9 +240,10 @@ export class Graph {
       ctx.fill();
 
       // X Value Text (Index)
+      const entry = this._entries[i];
       ctx.fillStyle = this._options.xSegmentColor;
       ctx.strokeStyle = this._options.xSegmentColor;
-      ctx.fillText(i.toString(), X, HEIGHT - this._y_offset + 12);
+      ctx.fillText((entry && entry.label || i).toString(), X, HEIGHT - this._y_offset + 12);
     }
   }
 
@@ -257,7 +259,7 @@ export class Graph {
     // Find max bar value to map based on yMax
     const Y_SEGMENTS = HEIGHT / graphSegments_Y;
     const maxY_segment = Y_SEGMENTS * (graphSegments_Y - 2);
-    const maxBarValue = max(this._entries.map(elt => elt.position.y));
+    const maxBarValue = max(this._entries.map(elt => elt.val));
     
     // Space out each Entry to given Segments
     const X_SEGMENTS = (WIDTH - this._x_padding) / graphSegments_X;
@@ -267,9 +269,9 @@ export class Graph {
         break;
       
       const entry = this._entries[i];
-      const { y } = entry.position;
+      const { val: y, color } = entry;
       
-      ctx.fillStyle = entry.color;
+      ctx.fillStyle = color;
       ctx.beginPath();
       
       // Max X & Y Points
