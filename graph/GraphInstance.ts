@@ -2,10 +2,18 @@ import { CanvasInstance } from '../config/index.ts';
 import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils/index.ts';
 
 
+interface RGBA {
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+}
+
 export interface GraphOptions {
   // Canvas Width & Height
   width: number,
   height: number,
+  backgroundColor: RGBA,
   
   // Graph Text
   titleText: string,
@@ -73,6 +81,12 @@ export class Graph {
     this._options = {
       height: config && config.height || 480,
       width: config && config.width || 720,
+      backgroundColor: config && config.backgroundColor || {
+        r: 50, 
+        g: 50, 
+        b: 50, 
+        a: 0.5,
+      },
       
       titleText: config && config.titleText || 'title',
       xAxisText: config && config.xAxisText || 'X-Axis',
@@ -281,7 +295,8 @@ export class Graph {
    * Draws graph with entries to Canvas Context
    */
   public draw() {
-    background(50, 50, 50, 0.5);
+    const { r, g, b, a } = this._options.backgroundColor;
+    background(r, g, b, a);
     
     this._draw_bars();
     this._draw_graph_outline();
@@ -299,6 +314,14 @@ export class Graph {
 
     if (this._options.verbose)
       console.log(`Graph save to '${imagePath}'`);
+  }
+
+  /**
+   * @returns Image buffer
+   */
+  public toBuffer() {
+    const { canvas } = CanvasInstance;
+    return canvas.toBuffer();
   }
   
 };
