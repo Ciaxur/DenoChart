@@ -44,6 +44,9 @@ export interface GraphOptions {
   xSegmentColor: string,
   ySegmentColor: string,
 
+  // Graph Values
+  graphValuePrecision: number,    // Rounds floating-point values to given nth number
+
   // DEBUG: Options
   verbose: boolean,   // Enable/Disable Logging
 }
@@ -72,12 +75,9 @@ export class Graph {
    * @param config (Optional) Graph Configuration
    */
   constructor(config?: Partial<GraphOptions>) {
-    const { HEIGHT } = CanvasInstance;
-    
     // Setup Default Segments & Max Values
     const graphSegments_Y = 10;
-    const yMax = (HEIGHT / graphSegments_Y) * (graphSegments_Y - 2);
-    
+
     // Configure Graph
     this._options = {
       height: config && config.height || 480,
@@ -110,6 +110,8 @@ export class Graph {
       
       xSegmentColor: config && config.xSegmentColor || 'rgb(255,255,255)',
       ySegmentColor: config && config.ySegmentColor || 'rgb(255,255,255)',
+
+      graphValuePrecision: config && config.graphValuePrecision || 2,
 
       verbose: config && config.verbose || false,
     }
@@ -224,7 +226,7 @@ export class Graph {
       const normalized = normalize((HEIGHT - this._y_padding - Y), 0, maxY_segment);
       const yVal = normalized * this._options.yMax;
       ctx.fillText(
-        yVal.toString(),
+        (!(yVal % 1) ? yVal : yVal.toFixed(graphValuePrecision)).toString(),
         this._x_padding - ((yVal % 1 === 0) ? 25 :35),
         Y,
       );
@@ -249,9 +251,23 @@ export class Graph {
 
       // X Value Text (Index)
       const entry = this._entries[i];
+      const entryFloatVal = entry && entry.label && Number.parseFloat(entry.label) || NaN;
       ctx.fillStyle = this._options.xSegmentColor;
       ctx.strokeStyle = this._options.xSegmentColor;
-      ctx.fillText((entry && entry.label || i).toString(), X, HEIGHT - this._y_offset + 12);
+      ctx.fillText(
+        (entry && entry.label
+          && (  // Set fixed floating point decimal IF parsable float
+            isNaN(entryFloatVal)
+              ? entry.label
+              : !(entryFloatVal % 1)  // Only set fixed precision for Floating-point values
+                ? entryFloatVal
+                : entryFloatVal.toFixed(graphValuePrecision)
+          )
+          || i
+        ).toString(),
+        X,
+        HEIGHT - this._y_offset + 12
+      );
     }
   }
 
@@ -260,7 +276,7 @@ export class Graph {
    */
   private _draw_bars() {
     const { ctx, HEIGHT, WIDTH } = CanvasInstance;
-    const { bar_width, graphSegments_X, graphSegments_Y } = this._options;
+    const { bar_width, graphSegments_X, graphSegments_Y, graphValuePrecision } = this._options;
     
     ctx.save();
 
@@ -295,7 +311,10 @@ export class Graph {
       ctx.closePath();
 
       // Y Value text (Value)
-      ctx.fillText(y.toString(), X + 5, HEIGHT - this._y_offset - Y - 10);
+      const val = y % 1 !== 0
+        ? y.toFixed(graphValuePrecision)
+        : y;
+      ctx.fillText(val.toString(), X + 5, HEIGHT - this._y_offset - Y - 10);
     }
     
     ctx.restore();
