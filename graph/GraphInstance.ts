@@ -1,5 +1,5 @@
 import { CanvasInstance } from '../config/index.ts';
-import { Vector2D, normalize, max, background, drawTextWithFont } from '../utils/index.ts';
+import { normalize, max, background, drawTextWithFont } from '../utils/index.ts';
 
 
 interface RGBA {

@@ -3,21 +3,28 @@ A graph library for Deno. Inspired by [Chart.js](https://www.chartjs.org/). A si
 
 ## 🚀 Use with Deno
 ```typescript
-import Graph, { Vector2D } from 'https://deno.land/x/deno_chart/mod.ts';
+import Graph from 'https://deno.land/x/deno_chart/mod.ts';
 
 const graph = new Graph({
   titleText: 'Uptime',
   xAxisText: 'Hours',
   yAxisText: 'Day',
+
+  backgroundColor: {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 0.75,
+  },
   
   yMax: 50,
   bar_width: 25,
   graphSegments_X: 18,
 
-  xTextColor: 'rgba(255,255,255,1)',
-  xSegmentColor: 'rgba(255,255,255,0.5)',
-  yTextColor: 'rgba(255,255,255,1)',
-  ySegmentColor: 'rgba(255,255,255,0.5)',
+  xTextColor:     'rgba(255,255,255,1)',
+  xSegmentColor:  'rgba(255,255,255,0.5)',
+  yTextColor:     'rgba(255,255,255,1)',
+  ySegmentColor:  'rgba(255,255,255,0.5)',
 
   // Verbose Logging (Optional)
   verbose: true,
@@ -34,7 +41,8 @@ for (let i = 0; i < 12; i++) {
   const y = Math.floor(Math.random() * 50);
 
   graph.add({
-    position: new Vector2D(i, y),
+    val: y,
+    label: (i + 1).toString(),
     color: clr,
   });
 }
